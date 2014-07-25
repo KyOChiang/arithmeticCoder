@@ -48,6 +48,7 @@ void getRangeOfSymbol(Range *range, uint32 symbol, CFT *cft,int tableSize){
   int tbPtr;
   uint64 rangeDiff, tempL, tempU;
   uint32 low_Count, up_Count, total_Count;
+  
   rangeDiff = ((uint64)range->upper - range->lower) + 1;
   total_Count = cft[tableSize-1].cum_Freq;
   
@@ -62,9 +63,6 @@ void getRangeOfSymbol(Range *range, uint32 symbol, CFT *cft,int tableSize){
       break;
     }
   }
-  // printf("ub : %u\n",range->upper);
-  // printf("lb : %u\n",range->lower);
-  
   tempL = (rangeDiff * low_Count);
   tempL = tempL / total_Count;
   tempL = tempL + range->lower;
@@ -76,16 +74,13 @@ void getRangeOfSymbol(Range *range, uint32 symbol, CFT *cft,int tableSize){
   
   range->lower = tempL;
   range->upper = tempU;
-  
-  // printf("range different : %llu\n",rangeDiff);
-  // printf("cum_count - 1 : %u\n",low_Count);
-  // printf("cum_count :%u\n",up_Count);
-  // printf("total_count : %u\n",total_Count);
-  // printf("ua : %u\n",range->upper);
-  // printf("la : %u\n",range->lower);
 }
 
+void rangeDel(Range *range){
+  free(range);
+}
 
+// Modify Documentation later
 
 
 
