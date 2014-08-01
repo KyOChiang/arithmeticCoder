@@ -1,5 +1,5 @@
 #include "unity.h"
-#include "Stream.h"
+#include "mock_Stream.h"
 #include "Range.h"
 #include "dataType.h"
 #include "limits.h"
@@ -219,4 +219,153 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_1_2_
   TEST_ASSERT_EQUAL_UINT32(0x628F5C27,range1231->upper);
   TEST_ASSERT_EQUAL_UINT32(0x5EB851EB,range1231->lower);
 }
+
+///////////////////////////
+// andMask32bit - Test to mask 32 bit
+//////////////////////////
+void test_andMask32bit_should_mask_all_the_value_to_0_except_MSB(){
+  Range* range = rangeNew();
+  range->upper = 0xF341FFBA; 
+  range->lower = 0x44215678;
+  
+  andMask32bit(range);
+  TEST_ASSERT_EQUAL_UINT32(0x80000000,range->upper);
+  TEST_ASSERT_EQUAL_UINT32(0x00000000,range->lower);
+  
+  range->upper = 0xF341FFBA; 
+  range->lower = 0xC4215678;
+  
+  andMask32bit(range);
+  TEST_ASSERT_EQUAL_UINT32(0x80000000,range->upper);
+  TEST_ASSERT_EQUAL_UINT32(0x80000000,range->lower);
+}
+
+///////////////////////////
+// encoderScaling
+//////////////////////////
+void test_encoderScaling_for_E1_E3_E3_scaling_should_do_the_scaling(){
+  Range* range = rangeNew();
+  Stream out;
+  range->lower = 0x34000000;   // 0011 0100 .... 0000
+  range->upper = 0x45000000;   // 0100 0101 .... 0000
+  
+  streamWriteBit_ExpectAndReturn(&out,0,1);
+  encoderScaling(range,&out);
+  
+  TEST_ASSERT_EQUAL_UINT32(0xA8000007,range->upper);
+  TEST_ASSERT_EQUAL_UINT32(0x20000000,range->lower);
+  TEST_ASSERT_EQUAL(2,range->scale3);
+}
+
+void test_encoderScaling_for_E2_E3_E3_scaling_should_do_the_scaling(){
+  Range* range = rangeNew();
+  Stream out;
+  range->lower = 0xB4000000;   // 1011 0100 .... 0000
+  range->upper = 0xC5000000;   // 1100 0101 .... 0000
+  
+  streamWriteBit_ExpectAndReturn(&out,1,1);
+  encoderScaling(range,&out);
+  
+  TEST_ASSERT_EQUAL_UINT32(0xA8000007,range->upper);
+  TEST_ASSERT_EQUAL_UINT32(0x20000000,range->lower);
+  TEST_ASSERT_EQUAL(2,range->scale3);
+}
+
+void test_encoderScaling_should_do_nothing_if_upper_is_0x00123456_and_lower_is_0x11123456(){
+  Range* range = rangeNew();
+  Stream out;
+  range->lower = 0x00123456;   // 0000 0000 .... 0110
+  range->upper = 0xC1123456;   // 1100 0001 .... 0110
+  
+  encoderScaling(range,&out);
+  
+  TEST_ASSERT_EQUAL_UINT32(0xC1123456,range->upper);
+  TEST_ASSERT_EQUAL_UINT32(0x00123456,range->lower);
+  TEST_ASSERT_EQUAL(0,range->scale3);
+}
+
+void test_encoderScaling_for_E3_E3_E3_scaling_should_increment_the_scale_by_3(){
+  Range* range = rangeNew();
+  Stream out;
+  range->lower = 0x74000000;   // 0111 0100 .... 0000
+  range->upper = 0x85000000;   // 1000 0101 .... 0000
+  
+  encoderScaling(range,&out);
+  
+  TEST_ASSERT_EQUAL_UINT32(0xA8000007,range->upper);
+  TEST_ASSERT_EQUAL_UINT32(0x20000000,range->lower);
+  TEST_ASSERT_EQUAL(3,range->scale3);
+}
+
+void test_encoderScaling_for_E3_E3_E3_E2_should_do_the_scaling(){
+  Range* range = rangeNew();
+  Stream out;
+  range->lower = 0x74000000;   // 0111 0100 .... 0000
+  range->upper = 0x85000000;   // 1000 0101 .... 0000
+  
+  encoderScaling(range,&out);
+  TEST_ASSERT_EQUAL_UINT32(0xA8000007,range->upper);
+  TEST_ASSERT_EQUAL_UINT32(0x20000000,range->lower);
+  TEST_ASSERT_EQUAL(3,range->scale3);
+  
+  range->upper = 0xFA000001;  // 1111 1010 .... 0001
+  range->lower = 0x9A000000;  // 1001 1010 .... 0000
+  
+  streamWriteBit_ExpectAndReturn(&out,1,1);
+  streamWriteBit_ExpectAndReturn(&out,0,2);
+  streamWriteBit_ExpectAndReturn(&out,0,3);
+  streamWriteBit_ExpectAndReturn(&out,0,4);
+  
+  encoderScaling(range,&out);
+  TEST_ASSERT_EQUAL_UINT32(0xF4000003,range->upper); //1111 0100 .... 0011
+  TEST_ASSERT_EQUAL_UINT32(0x34000000,range->lower); //0011 0100 .... 0000
+  TEST_ASSERT_EQUAL(0,range->scale3);
+}
+
+void test_encoderScaling_for_E3_E3_E3_E2_E2_should_do_the_scaling(){
+  Range* range = rangeNew();
+  Stream out;
+  range->lower = 0x74000000;   // 0111 0100 .... 0000
+  range->upper = 0x85000000;   // 1000 0101 .... 0000
+  
+  encoderScaling(range,&out);
+  TEST_ASSERT_EQUAL_UINT32(0xA8000007,range->upper);
+  TEST_ASSERT_EQUAL_UINT32(0x20000000,range->lower);
+  TEST_ASSERT_EQUAL(3,range->scale3);
+  
+  range->upper = 0xFA000001;  // 1111 1010 .... 0001
+  range->lower = 0xDA000000;  // 1101 1010 .... 0000
+  
+  streamWriteBit_ExpectAndReturn(&out,1,1);
+  streamWriteBit_ExpectAndReturn(&out,0,2);
+  streamWriteBit_ExpectAndReturn(&out,0,3);
+  streamWriteBit_ExpectAndReturn(&out,0,4);
+  streamWriteBit_ExpectAndReturn(&out,1,5);
+  
+  encoderScaling(range,&out);
+  TEST_ASSERT_EQUAL_UINT32(0xE8000007,range->upper); //1110 1000 .... 0111
+  TEST_ASSERT_EQUAL_UINT32(0x68000000,range->lower); //0110 1000 .... 0000
+  TEST_ASSERT_EQUAL(0,range->scale3);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

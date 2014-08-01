@@ -1,6 +1,7 @@
 #ifndef RANGE_H_
 #define RANGE_H_
 #include "dataType.h"
+#include "Stream.h"
 
 typedef struct{
   uint32 lower;
@@ -17,5 +18,7 @@ void dumpRange(Range *range);
 Range *rangeNew();
 void rangeDel(Range *range);
 void getRangeOfSymbol(Range *range, uint32 symbol, CFT *cft,int tableSize);
+void encoderScaling(Range *range, Stream *out);
+void andMask32bit(Range *range);
 
 #endif
