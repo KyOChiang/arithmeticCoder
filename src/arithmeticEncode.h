@@ -1,5 +1,5 @@
-#ifndef RANGE_H_
-#define RANGE_H_
+#ifndef ARITHMETIC_ENCODE_H_
+#define ARITHMETIC_ENCODE_H_
 #include "dataType.h"
 #include "Stream.h"
 

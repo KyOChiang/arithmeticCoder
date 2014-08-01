@@ -1,6 +1,6 @@
 #include "unity.h"
 #include "mock_Stream.h"
-#include "Range.h"
+#include "arithmeticEncode.h"
 #include "dataType.h"
 #include "limits.h"
 

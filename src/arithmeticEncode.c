@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <malloc.h>
-#include "Range.h"
+#include "arithmeticEncode.h"
 #include "dataType.h"
 #include "limits.h"
 
