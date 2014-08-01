@@ -20,5 +20,6 @@ void rangeDel(Range *range);
 void getRangeOfSymbol(Range *range, uint32 symbol, CFT *cft,int tableSize);
 void encoderScaling(Range *range, Stream *out);
 void andMask32bit(Range *range);
+void arithmeticEncode(int *dataPtr, int dataLength, CFT *cft, int tableSize, Stream *out);
 
 #endif

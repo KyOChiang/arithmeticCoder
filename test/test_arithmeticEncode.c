@@ -348,9 +348,65 @@ void test_encoderScaling_for_E3_E3_E3_E2_E2_should_do_the_scaling(){
   TEST_ASSERT_EQUAL(0,range->scale3);
 }
 
-
-
-
+///////////////////////////
+// arithmeticEncode
+//////////////////////////
+void test_arithmeticEncode_should_perform_encoding_process_on_symbol_1321_and_create_a_tag(){
+  int dataLength = 4, t_Size = 3;
+  int symbol[] = {1,3,2,1};
+  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
+               {.symbol = 2, .cum_Freq = 40},
+               {.symbol = 3, .cum_Freq = 50}};
+  
+  Stream out;
+  
+  streamWriteBit_ExpectAndReturn(&out,0,1);
+  streamWriteBit_ExpectAndReturn(&out,1,2);
+  streamWriteBit_ExpectAndReturn(&out,1,3);
+  streamWriteBit_ExpectAndReturn(&out,1,4);
+  streamWriteBit_ExpectAndReturn(&out,0,5);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,6);
+  streamWriteBit_ExpectAndReturn(&out,1,7);
+  streamWriteBit_ExpectAndReturn(&out,1,8);
+  streamWriteBit_ExpectAndReturn(&out,0,1);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,2);
+  streamWriteBit_ExpectAndReturn(&out,1,3);
+  streamWriteBit_ExpectAndReturn(&out,1,4);
+  streamWriteBit_ExpectAndReturn(&out,0,5);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,6);
+  streamWriteBit_ExpectAndReturn(&out,1,7);
+  streamWriteBit_ExpectAndReturn(&out,1,8);
+  streamWriteBit_ExpectAndReturn(&out,0,1);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,2);
+  streamWriteBit_ExpectAndReturn(&out,1,3);
+  streamWriteBit_ExpectAndReturn(&out,1,4);
+  streamWriteBit_ExpectAndReturn(&out,0,5);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,6);
+  streamWriteBit_ExpectAndReturn(&out,1,7);
+  streamWriteBit_ExpectAndReturn(&out,1,8);
+  streamWriteBit_ExpectAndReturn(&out,0,1);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,2);
+  streamWriteBit_ExpectAndReturn(&out,1,3);
+  streamWriteBit_ExpectAndReturn(&out,1,4);
+  streamWriteBit_ExpectAndReturn(&out,0,5);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,6);
+  streamWriteBit_ExpectAndReturn(&out,1,7);
+  streamWriteBit_ExpectAndReturn(&out,1,8);
+  streamWriteBit_ExpectAndReturn(&out,0,1);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,2);
+  streamWriteBit_ExpectAndReturn(&out,0,3);
+  streamWriteBit_ExpectAndReturn(&out,0,4);
+  streamWriteBit_ExpectAndReturn(&out,0,5);
+  arithmeticEncode(symbol, dataLength, cft, t_Size, &out);
+}
 
 
 

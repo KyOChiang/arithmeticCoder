@@ -6,15 +6,13 @@
 
 /*  Define keyword
  *  
- *  maskUpper         : To mask the 1st MSB of upper in range
- *  maskLower         : To mask the 1st MSB of lower in range
+ *  maskMSB           : To mask the 1st MSB of value
  *  e3Mask            : To mask the 1st and 2nd MSB of upper and lower in range
  *  MSB10             : IS a must that 1st and 2nd MSB of upper must be "10...." for E3 Scaling
  *  MSB01             : IS a must that 1st and 2nd MSB of lower must be "01...." for E3 Scaling
  *  shiftToLeftBy1Bit : Shift variable to left by 1 bit
  */
-#define maskUpper (range->upper & 0x80000000)
-#define maskLower (range->lower & 0x80000000)
+#define maskMSB(x) (x & 0x80000000)
 #define e3Mask(x) (x & 0xC0000000)
 #define MSB10 0x80000000
 #define MSB01 0x40000000
@@ -27,8 +25,8 @@
  *  range(in)     : Pass in Range struct to display data inside
  */
 void dumpRange(Range *range){
-  printf("Upper range: %u\n", range->upper);
-  printf("Lower range: %u\n", range->lower);
+  printf("Upper range: %x\n", range->upper);
+  printf("Lower range: %x\n", range->lower);
   printf("Scale3 range: %u\n", range->scale3);
 }
 
@@ -55,6 +53,7 @@ Range *rangeNew(){
  *  Arguments
  *  range(in/out)     : The current range with current upper limit and lower limit
  *  symbol(in)        : The input symbol required to get upper and lower limit
+ *  tableSize(in)     : The size of CFT
  *  tbPtr(out)        : Index counter for CFT (Cumulative Frequency Table)
  *  rangeDiff(in)     : Subtraction of upper limit to lower limit from range
  *  tempL(out)        : temporary variable to store lower limit
@@ -116,7 +115,7 @@ void rangeDel(Range *range){
  */
 void encoderScaling(Range *range, Stream *out){
   int transmitBit;
-  uint32 upLimit = maskUpper, lowLimit = maskLower;
+  uint32 upLimit = maskMSB(range->upper), lowLimit = maskMSB(range->lower);
   uint32 e3Up = e3Mask(range->upper), e3Low = e3Mask(range->lower);
   
   while((upLimit == lowLimit)||((e3Up == MSB10) && (e3Low == MSB01))){
@@ -143,7 +142,7 @@ void encoderScaling(Range *range, Stream *out){
       range->upper = (uint64)(range->upper) + 0x80000000;
       range->lower = range->lower & 0x7FFFFFFF;
     }
-    upLimit = maskUpper, lowLimit = maskLower;
+    upLimit = maskMSB(range->upper), lowLimit = maskMSB(range->lower);
     e3Up = e3Mask(range->upper), e3Low = e3Mask(range->lower);
   }
 }
@@ -157,6 +156,59 @@ void encoderScaling(Range *range, Stream *out){
 void andMask32bit(Range *range){
   range->upper = (range->upper & 0x80000000);
   range->lower = (range->lower & 0x80000000);
+}
+
+/*  arithmeticEncode
+ *  Function          : Encode data into tag
+ *
+ *  How               : 1. Initialize upper and lower of range with 0xFFFFFFFF and 0
+ *                      2. If not EOF(replaced by number of inputs->dataLength)
+ *                         Update the range->upper and range->lower(probability range for the symbol)
+ *                      3. Perform the E1/E2/E3 scaling if necessary
+ *                      4. Update the arrayPtr and dataLength and start over from step 2 again
+ *                      5. If EOF, store the range->lower to lowTransmit, shift the 1st MSB and send out
+ *                      6. Check scale3, if zero, transmit out all the remaining bits of lowTransmit
+ *                         Else, send out 1 and decrease the scale3 by 1
+ *  Arguments
+ *  dataPtr(in)           : A pointer point to an array that store symbol
+ *  dataLength(in)        : Total size of an array that store symbol
+ *  cft(in)               : Cumulative Freq.(CF) Table that store symbol and their own CF
+ *  tableSize(in)         : The size of CFT
+ *  out(out)              : To store the transmit message (encode value)
+ *  arrayPtr(in)          : Use to point the location of data from start
+ *  lowTransmitCount(in)  : Total times to transmit the last range->lower
+ *  lowTransmit(in)       : Temporary store range->lower and use for shift and MSB check
+ */
+void arithmeticEncode(int *dataPtr, int dataLength, CFT *cft, int tableSize, Stream *out){
+  int arrayPtr = 0, lowTransmitCount = 32;
+  uint32 lowTransmit;
+  Range* range;
+  range = rangeNew();
+  
+  while(dataLength != 0){
+    getRangeOfSymbol(range, dataPtr[arrayPtr], cft, tableSize);
+    printf("\n");
+    dumpRange(range);
+    encoderScaling(range,out);
+    dumpRange(range);
+    arrayPtr = arrayPtr + 1;
+    dataLength = dataLength - 1;
+  }
+  lowTransmit = range->lower;
+  
+  while(lowTransmitCount!=0){
+    if(maskMSB(lowTransmit) == 0x80000000)
+      streamWriteBit(out,1);
+    else
+      streamWriteBit(out,0);
+    
+    while(range->scale3 > 0){
+      streamWriteBit(out,1);
+      range->scale3 = range->scale3 - 1;
+    }
+    lowTransmit = shiftToLeftBy1Bit(lowTransmit);
+    lowTransmitCount = lowTransmitCount - 1;
+  }
 }
 
 
