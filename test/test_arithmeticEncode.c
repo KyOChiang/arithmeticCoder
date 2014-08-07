@@ -2,7 +2,6 @@
 #include "mock_Stream.h"
 #include "arithmeticEncode.h"
 #include "dataType.h"
-#include "limits.h"
 
 void setUp(void){}
 void tearDown(void){}

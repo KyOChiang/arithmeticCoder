@@ -2,7 +2,6 @@
 #include <malloc.h>
 #include "arithmeticEncode.h"
 #include "dataType.h"
-#include "limits.h"
 
 /*  Define keyword
  *  
