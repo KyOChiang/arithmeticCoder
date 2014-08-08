@@ -3,20 +3,6 @@
 #include "arithmeticEncode.h"
 #include "dataType.h"
 
-/*  Define keyword
- *  
- *  maskMSB           : To mask the 1st MSB of value
- *  e3Mask            : To mask the 1st and 2nd MSB of upper and lower in range
- *  MSB10             : IS a must that 1st and 2nd MSB of upper must be "10...." for E3 Scaling
- *  MSB01             : IS a must that 1st and 2nd MSB of lower must be "01...." for E3 Scaling
- *  shiftToLeftBy1Bit : Shift variable to left by 1 bit
- */
-#define maskMSB(x) (x & 0x80000000)
-#define e3Mask(x) (x & 0xC0000000)
-#define MSB10 0x80000000
-#define MSB01 0x40000000
-#define shiftToLeftBy1Bit(x) (x<<1)
-
 /*  dumpRange
  *  Function      : To print upper, lower and scale3.
  *
@@ -61,7 +47,7 @@ Range *rangeNew(){
  *  up_Count(in)      : the upper limit for the input symbol
  *  total_Count(in)   : the cum_Freq of last symbol
  */
-void getRangeOfSymbol(Range *range, uint32 symbol, CFT *cft,int tableSize){
+void getRangeOfSymbol(Range *range, char symbol, CFT *cft,int tableSize){
   int tbPtr;
   uint64 rangeDiff, tempL, tempU;
   uint32 low_Count, up_Count, total_Count;
@@ -178,7 +164,7 @@ void andMask32bit(Range *range){
  *  lowTransmitCount(in)  : Total times to transmit the last range->lower
  *  lowTransmit(in)       : Temporary store range->lower and use for shift and MSB check
  */
-void arithmeticEncode(int *dataPtr, int dataLength, CFT *cft, int tableSize, Stream *out){
+void arithmeticEncode(char *dataPtr, int dataLength, CFT *cft, int tableSize, Stream *out){
   int arrayPtr = 0, lowTransmitCount = 32;
   uint32 lowTransmit;
   Range* range;

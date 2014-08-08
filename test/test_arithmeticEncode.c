@@ -22,24 +22,23 @@ void test_rangeNew_to_initialize_upper_lower_and_scale3(){
 // getRangeOfSymbol
 //////////////////////////
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol1(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol = 1;
+  char symbol = '1';
   Range* range1 = rangeNew();
   getRangeOfSymbol(range1,symbol,cft,t_Size);
-  
   TEST_ASSERT_EQUAL_UINT32(0x7FFFFFFF,range1->upper);
   TEST_ASSERT_EQUAL_UINT32(0,range1->lower);
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol2(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol = 2;
+  char symbol = '2';
   Range* range2 = rangeNew();
   getRangeOfSymbol(range2,symbol,cft,t_Size);
   
@@ -48,11 +47,11 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol2(){
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol3(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol = 3;
+  char symbol = '3';
   Range* range3 = rangeNew();
   getRangeOfSymbol(range3,symbol,cft,t_Size);
   
@@ -61,11 +60,11 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol3(){
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_1_1(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_1 = 1;
+  char symbol_1 = '1';
   Range* range11 = rangeNew();
   getRangeOfSymbol(range11,symbol_1,cft,t_Size);
   getRangeOfSymbol(range11,symbol_1,cft,t_Size);
@@ -75,12 +74,12 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_1_1(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_1_2(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_1 = 1;
-  uint32 symbol_2 = 2;
+  char symbol_1 = '1';
+  char symbol_2 = '2';
   Range* range12 = rangeNew();
   getRangeOfSymbol(range12,symbol_1,cft,t_Size);
   getRangeOfSymbol(range12,symbol_2,cft,t_Size);
@@ -90,12 +89,12 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_1_2(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_1_3(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_1 = 1;
-  uint32 symbol_3 = 3;
+  char symbol_1 = '1';
+  char symbol_3 = '3';
   Range* range13 = rangeNew();
   getRangeOfSymbol(range13,symbol_1,cft,t_Size);
   getRangeOfSymbol(range13,symbol_3,cft,t_Size);
@@ -105,12 +104,12 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_1_3(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_2_1(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_1 = 1;
-  uint32 symbol_2 = 2;
+  char symbol_1 = '1';
+  char symbol_2 = '2';
   Range* range21 = rangeNew();
   getRangeOfSymbol(range21,symbol_2,cft,t_Size);
   getRangeOfSymbol(range21,symbol_1,cft,t_Size);
@@ -120,11 +119,11 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_2_1(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_2_2(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_2 = 2;
+  char symbol_2 = '2';
   Range* range22 = rangeNew();
   getRangeOfSymbol(range22,symbol_2,cft,t_Size);
   getRangeOfSymbol(range22,symbol_2,cft,t_Size);
@@ -134,12 +133,12 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_2_2(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_2_3(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_2 = 2;
-  uint32 symbol_3 = 3;
+  char symbol_2 = '2';
+  char symbol_3 = '3';
   Range* range23 = rangeNew();
   getRangeOfSymbol(range23,symbol_2,cft,t_Size);
   getRangeOfSymbol(range23,symbol_3,cft,t_Size);
@@ -149,12 +148,12 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_2_3(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_3_1(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_1 = 1;
-  uint32 symbol_3 = 3;
+  char symbol_1 = '1';
+  char symbol_3 = '3';
   Range* range31 = rangeNew();
   getRangeOfSymbol(range31,symbol_3,cft,t_Size);
   getRangeOfSymbol(range31,symbol_1,cft,t_Size);
@@ -164,12 +163,12 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_3_1(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_3_2(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_2 = 2;
-  uint32 symbol_3 = 3;
+  char symbol_2 = '2';
+  char symbol_3 = '3';
   Range* range32 = rangeNew();
   getRangeOfSymbol(range32,symbol_3,cft,t_Size);
   getRangeOfSymbol(range32,symbol_2,cft,t_Size);
@@ -179,11 +178,11 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_3_2(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_3_3(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_3 = 3;
+  char symbol_3 = '3';
   Range* range33 = rangeNew();
   getRangeOfSymbol(range33,symbol_3,cft,t_Size);
   getRangeOfSymbol(range33,symbol_3,cft,t_Size);
@@ -193,13 +192,13 @@ void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_3_3(
 }
 
 void test_getRangeOfSymbol_should_retrieve_new_range_for_symbol_sequence_of_1_2_3_1(){
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   int t_Size = 3;
-  uint32 symbol_1 = 1;
-  uint32 symbol_2 = 2;
-  uint32 symbol_3 = 3;
+  char symbol_1 = '1';
+  char symbol_2 = '2';
+  char symbol_3 = '3';
   Range* range1231 = rangeNew();
   
   getRangeOfSymbol(range1231,symbol_1,cft,t_Size);
@@ -352,10 +351,12 @@ void test_encoderScaling_for_E3_E3_E3_E2_E2_should_do_the_scaling(){
 //////////////////////////
 void test_arithmeticEncode_should_perform_encoding_process_on_symbol_1321_and_create_a_tag(){
   int dataLength = 4, t_Size = 3;
-  int symbol[] = {1,3,2,1};
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 25},
-               {.symbol = 2, .cum_Freq = 40},
-               {.symbol = 3, .cum_Freq = 50}};
+  char symbol[] = "1321";
+  char *dataPtr;
+  dataPtr = symbol;
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
   
   Stream out;
   
@@ -404,15 +405,17 @@ void test_arithmeticEncode_should_perform_encoding_process_on_symbol_1321_and_cr
   streamWriteBit_ExpectAndReturn(&out,0,3);
   streamWriteBit_ExpectAndReturn(&out,0,4);
   streamWriteBit_ExpectAndReturn(&out,0,5);
-  arithmeticEncode(symbol, dataLength, cft, t_Size, &out);
+  arithmeticEncode(dataPtr, dataLength, cft, t_Size, &out);
 }
 
 void test_arithmeticEncode_should_perform_encoding_process_with_another_CFT_on_symbol_1321_and_create_a_tag(){
   int dataLength = 4, t_Size = 3;
-  int symbol[] = {1,3,2,1};
-  CFT cft[] = {{.symbol = 1, .cum_Freq = 40},
-               {.symbol = 2, .cum_Freq = 41},
-               {.symbol = 3, .cum_Freq = 50}};
+  char symbol[] = "1321";
+  char *dataPtr;
+  dataPtr = symbol;
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 40},
+               {.symbol = '2', .cum_Freq = 41},
+               {.symbol = '3', .cum_Freq = 50}};
   
   Stream out;
   
@@ -466,6 +469,66 @@ void test_arithmeticEncode_should_perform_encoding_process_with_another_CFT_on_s
   arithmeticEncode(symbol, dataLength, cft, t_Size, &out);
 }
 
+void test_arithmeticEncode_should_perform_encoding_process_on_symbol_acba_and_create_a_tag(){
+  int dataLength = 4, t_Size = 3;
+  char symbol[] = "acba";
+  char *dataPtr;
+  dataPtr = symbol;
+  CFT cft[] = {{.symbol = 'a', .cum_Freq = 40},
+               {.symbol = 'b', .cum_Freq = 41},
+               {.symbol = 'c', .cum_Freq = 50}};
+  
+  Stream out;
+  
+  streamWriteBit_ExpectAndReturn(&out,1,1);
+  streamWriteBit_ExpectAndReturn(&out,1,2);
+  streamWriteBit_ExpectAndReturn(&out,0,3);
+  streamWriteBit_ExpectAndReturn(&out,0,4);
+  streamWriteBit_ExpectAndReturn(&out,0,5);
+  streamWriteBit_ExpectAndReturn(&out,1,6);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,7);
+  streamWriteBit_ExpectAndReturn(&out,1,8);
+  streamWriteBit_ExpectAndReturn(&out,0,1);
+  streamWriteBit_ExpectAndReturn(&out,1,2);
+  streamWriteBit_ExpectAndReturn(&out,1,3);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,4);
+  streamWriteBit_ExpectAndReturn(&out,1,5);
+  streamWriteBit_ExpectAndReturn(&out,1,6);
+  streamWriteBit_ExpectAndReturn(&out,0,7);
+  
+  streamWriteBit_ExpectAndReturn(&out,1,8);
+  streamWriteBit_ExpectAndReturn(&out,0,1);
+  streamWriteBit_ExpectAndReturn(&out,1,2);
+  streamWriteBit_ExpectAndReturn(&out,0,3);
+  
+  streamWriteBit_ExpectAndReturn(&out,1,4);
+  streamWriteBit_ExpectAndReturn(&out,1,5);
+  streamWriteBit_ExpectAndReturn(&out,1,6);
+  streamWriteBit_ExpectAndReturn(&out,0,7);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,8);
+  streamWriteBit_ExpectAndReturn(&out,1,1);
+  streamWriteBit_ExpectAndReturn(&out,1,2);
+  streamWriteBit_ExpectAndReturn(&out,1,3);
+  
+  streamWriteBit_ExpectAndReturn(&out,1,4);
+  streamWriteBit_ExpectAndReturn(&out,1,5);
+  streamWriteBit_ExpectAndReturn(&out,0,6);
+  streamWriteBit_ExpectAndReturn(&out,0,7);
+  
+  streamWriteBit_ExpectAndReturn(&out,1,8);
+  streamWriteBit_ExpectAndReturn(&out,1,1);
+  streamWriteBit_ExpectAndReturn(&out,1,2);
+  streamWriteBit_ExpectAndReturn(&out,0,3);
+  
+  streamWriteBit_ExpectAndReturn(&out,0,4);
+  streamWriteBit_ExpectAndReturn(&out,0,5);
+  streamWriteBit_ExpectAndReturn(&out,0,6);
+  streamWriteBit_ExpectAndReturn(&out,0,7);
+  arithmeticEncode(symbol, dataLength, cft, t_Size, &out);
+}
 
 
 
