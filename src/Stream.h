@@ -11,5 +11,6 @@ typedef struct{
 Stream *openStream(char *fileName, char *openMethod, int bufferSize);
 void *streamFlush(Stream *out);
 int streamWriteBit(Stream *out, int bit); //return how many bit write
-
+int streamWriteByte(Stream *out, char decodeSymbol, int bitSize);
+int streamReadBit(Stream *in, int bitSize); //decide how many bit to read from the file
 #endif

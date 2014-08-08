@@ -12,6 +12,7 @@ typedef struct{
 typedef struct{
   char symbol;
   uint32 cum_Freq;
+  uint32 occurNo;
 }CFT;
 
 void dumpRange(Range *range);
@@ -21,5 +22,6 @@ void getRangeOfSymbol(Range *range, char symbol, CFT *cft,int tableSize);
 void encoderScaling(Range *range, Stream *out);
 void andMask32bit(Range *range);
 void arithmeticEncode(char *dataPtr, int dataLength, CFT *cft, int tableSize, Stream *out);
+CFT *cftNew(Stream *in);
 
 #endif

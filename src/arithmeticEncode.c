@@ -15,6 +15,50 @@ void dumpRange(Range *range){
   printf("Scale3 range: %u\n", range->scale3);
 }
 
+CFT *cftNew(Stream *in){
+  int tempT_Size, t_Size = 0, t_Ptr = 0, loop, keepGetSymbol = 1;
+  char getSymbol;
+  CEXCEPTION_T error;
+  CFT *cft = calloc(sizeof(CFT),256);
+  
+  while(keepGetSymbol){
+    Try{
+      getSymbol = streamReadBit(in, 8);
+    }Catch(error){
+      keepGetSymbol = 0;
+    }
+    if(keepGetSymbol == 0)
+      break;
+    loop = 0;
+    for(t_Ptr = 0; t_Ptr < 256; t_Ptr = t_Ptr + 1){
+      if(cft[t_Ptr].symbol == '\0'){
+        cft[t_Ptr].symbol = getSymbol;
+        cft[t_Ptr].occurNo = cft[t_Ptr].occurNo + 1;
+        t_Ptr = t_Ptr + 1;
+        loop = 1;
+      }
+      else if(getSymbol == cft[t_Ptr].symbol){
+        cft[t_Ptr].occurNo = cft[t_Ptr].occurNo + 1;
+        loop = 1;
+      }
+      if(t_Ptr >= t_Size)
+        t_Size = t_Ptr;
+      if(loop == 1)
+        break;
+    }
+  }
+
+  tempT_Size = t_Size;
+  for(t_Ptr = 0; t_Ptr < tempT_Size; t_Ptr = t_Ptr + 1){
+    if(t_Ptr == 0)
+      cft[t_Ptr].cum_Freq = cft[t_Ptr].occurNo;
+    else
+      cft[t_Ptr].cum_Freq = cft[t_Ptr-1].cum_Freq + cft[t_Ptr].occurNo;
+  }
+  
+  return cft;
+}
+
 /*  rangeNew
  *  Function : To initialize a new range.
  *  
@@ -124,8 +168,8 @@ void encoderScaling(Range *range, Stream *out){
       range->scale3 = range->scale3 + 1;
       range->upper = shiftToLeftBy1Bit(range->upper) + 1; 
       range->lower = shiftToLeftBy1Bit(range->lower);
-      range->upper = (uint64)(range->upper) + 0x80000000;
-      range->lower = range->lower & 0x7FFFFFFF;
+      range->upper = complementMSB(range->upper);
+      range->lower = complementMSB(range->lower);
     }
     upLimit = maskMSB(range->upper), lowLimit = maskMSB(range->lower);
     e3Up = e3Mask(range->upper), e3Low = e3Mask(range->lower);
@@ -172,10 +216,8 @@ void arithmeticEncode(char *dataPtr, int dataLength, CFT *cft, int tableSize, St
   
   while(dataLength != 0){
     getRangeOfSymbol(range, dataPtr[arrayPtr], cft, tableSize);
-    printf("\n");
-    dumpRange(range);
+    // dumpRange(range);
     encoderScaling(range,out);
-    dumpRange(range);
     arrayPtr = arrayPtr + 1;
     dataLength = dataLength - 1;
   }

@@ -1,8 +1,14 @@
 #ifndef DATATYPE_H_
 #define DATATYPE_H_
 
+#include "CException.h"
+
 #define uint32 unsigned int
 #define uint64 unsigned long long
+
+typedef enum { NO_ERROR,
+               ERR_END_OF_FILE
+} ExceptionError;
 
 /*  Define keyword
  *  
