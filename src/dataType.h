@@ -2,6 +2,7 @@
 #define DATATYPE_H_
 
 #include "CException.h"
+#include <malloc.h>
 
 #define uint32 unsigned int
 #define uint64 unsigned long long

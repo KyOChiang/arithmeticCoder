@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <malloc.h>
 #include "arithmeticEncode.h"
 #include "dataType.h"
 
