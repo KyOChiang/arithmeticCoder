@@ -85,9 +85,54 @@ void test_decoderScaling_should_perform_E3_scaling_operation(){
   TEST_ASSERT_EQUAL_UINT32(0x90842021,tag);
 }
 
+///////////////////////////
+// arithmeticDecode
+//////////////////////////
+void test_arithmeticDecode_with_tag_should_return_1321(){
+  uint32 tag = 0xC56D5CF9;
+  int dataLength = 4, t_Size = 3;
+  Stream in, out;
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 40},
+               {.symbol = '2', .cum_Freq = 41},
+               {.symbol = '3', .cum_Freq = 50}};
+  
+  streamWriteByte_ExpectAndReturn(&out,cft[0].symbol,8, 8);
+  streamWriteByte_ExpectAndReturn(&out,cft[2].symbol,8, 16);
+  streamReadBit_ExpectAndReturn(&in, 1, 1);
+  streamReadBit_ExpectAndReturn(&in, 1, 1);
+  streamWriteByte_ExpectAndReturn(&out,cft[1].symbol,8, 24);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamWriteByte_ExpectAndReturn(&out,cft[0].symbol,8, 32);
+  
+  arithmeticDecode(dataLength, &tag, cft, t_Size, &out, &in);
+  //Tag: 1100 0101 0110 1101 0101 1100 1111 1001 1100 000
+}
 
-
-
+void test_arithmeticDecode_with_tag_on_different_cft_should_return_1321(){
+  uint32 tag = 0x73333333;
+  int dataLength = 4, t_Size = 3;
+  Stream in, out;
+  CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
+               {.symbol = '2', .cum_Freq = 40},
+               {.symbol = '3', .cum_Freq = 50}};
+  
+  streamWriteByte_ExpectAndReturn(&out,cft[0].symbol,8, 8);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamWriteByte_ExpectAndReturn(&out,cft[2].symbol,8, 16);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamWriteByte_ExpectAndReturn(&out,cft[1].symbol,8, 24);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamWriteByte_ExpectAndReturn(&out,cft[0].symbol,8, 32);
+  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  
+  arithmeticDecode(dataLength, &tag, cft, t_Size, &out, &in);
+  //Tag: 0111 0011 0011 0011 0011 0011 0011 0011 0000 0
+}
 
 
 

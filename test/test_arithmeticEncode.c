@@ -531,10 +531,55 @@ void test_arithmeticEncode_should_perform_encoding_process_on_symbol_acba_and_cr
 }
 
 ///////////////////////////
-// arithmeticEncode
+// cftNew
 //////////////////////////
 
-void test_cftNew_should_create_cft_for_symbol_1(){
+void test_cftNew_should_create_cft_for_1_symbol(){
+  Stream in;
+  CFT *cftPtr;
+  
+  streamReadBit_ExpectAndReturn(&in, 8, '1');
+  streamReadBit_ExpectAndThrow(&in, 8, ERR_END_OF_FILE);
+  cftPtr = cftNew(&in);
+  
+  TEST_ASSERT_EQUAL('1', cftPtr[0].symbol);
+  TEST_ASSERT_EQUAL(1, cftPtr[0].cum_Freq);
+  TEST_ASSERT_EQUAL(1, cftPtr[0].occurNo);
+}
+
+void test_cftNew_should_create_cft_for_2_difference_symbols(){
+  Stream in;
+  CFT *cftPtr;
+  
+  streamReadBit_ExpectAndReturn(&in, 8, '1');
+  streamReadBit_ExpectAndReturn(&in, 8, '2');
+  streamReadBit_ExpectAndThrow(&in, 8, ERR_END_OF_FILE);
+  cftPtr = cftNew(&in);
+  
+  TEST_ASSERT_EQUAL('1', cftPtr[0].symbol);
+  TEST_ASSERT_EQUAL(1, cftPtr[0].cum_Freq);
+  TEST_ASSERT_EQUAL(1, cftPtr[0].occurNo);
+  
+  TEST_ASSERT_EQUAL('2', cftPtr[1].symbol);
+  TEST_ASSERT_EQUAL(2, cftPtr[1].cum_Freq);
+  TEST_ASSERT_EQUAL(1, cftPtr[1].occurNo);
+}
+
+void test_cftNew_should_create_cft_for_2_same_symbols(){
+  Stream in;
+  CFT *cftPtr;
+  
+  streamReadBit_ExpectAndReturn(&in, 8, '1');
+  streamReadBit_ExpectAndReturn(&in, 8, '1');
+  streamReadBit_ExpectAndThrow(&in, 8, ERR_END_OF_FILE);
+  cftPtr = cftNew(&in);
+  
+  TEST_ASSERT_EQUAL('1', cftPtr[0].symbol);
+  TEST_ASSERT_EQUAL(2, cftPtr[0].cum_Freq);
+  TEST_ASSERT_EQUAL(2, cftPtr[0].occurNo);
+}
+  
+void test_cftNew_should_create_cft_for_symbols(){
   Stream in;
   CFT *cftPtr;
   

@@ -14,8 +14,33 @@ void dumpRange(Range *range){
   printf("Scale3 range: %u\n", range->scale3);
 }
 
+/*  cftNew
+ *  
+ *  Function          : Create new cumulative frequencies table (cft) by reading the char one by one
+ *  
+ *  How               : 1. Check if there got char or not. 
+ *                         If char there, start to get 1 symbol. Otherwise, return exception error.
+ *                      2. Check first index in table, is that empty or occupy by char.
+ *                         If not empty, compare the char and the symbol. If same, occurNo plus 1
+ *                         If not same, go to next index and check. If is a new symbol, add into the table, occurNo plus 1
+ *                      3. Get the next symbol and repeat step 2 again until there no more char.
+ *                      4. The cumulative frequency of each data in table is calculated as below:
+ *                           cft[x].cum_Freq = cft[x-1].cum_Freq + cft[x].occurNo
+ *                      5. Return the pointer that point to the created table.
+ *
+ *  Arguments   
+ *  in(in)            : Txt file contain characters and symbols
+ *  t_Size(out)       : size of cft table
+ *  t_Ptr(in)         : index pointer for cft
+ *  loop(in)          : Help to stop searching table if it is 1
+ *  keepGetSymbol(in) : Help to stop retrieve the next symbol if end of char
+ *  getSymbol(in)     : Use to store the return char from streamReadBit
+ *
+ *  return
+ *  cft             : a pointer to the created cft
+ */
 CFT *cftNew(Stream *in){
-  int tempT_Size, t_Size = 0, t_Ptr = 0, loop, keepGetSymbol = 1;
+  int t_Size = 0, t_Ptr = 0, loop, keepGetSymbol = 1;
   char getSymbol;
   CEXCEPTION_T error;
   CFT *cft = calloc(sizeof(CFT),256);
@@ -47,8 +72,7 @@ CFT *cftNew(Stream *in){
     }
   }
 
-  tempT_Size = t_Size;
-  for(t_Ptr = 0; t_Ptr < tempT_Size; t_Ptr = t_Ptr + 1){
+  for(t_Ptr = 0; t_Ptr < t_Size; t_Ptr = t_Ptr + 1){
     if(t_Ptr == 0)
       cft[t_Ptr].cum_Freq = cft[t_Ptr].occurNo;
     else

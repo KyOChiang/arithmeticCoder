@@ -4,12 +4,25 @@
 #include "arithmeticDecode.h"
 #include "dataType.h"
 
+/*  getSymbolFromTag
+ *  Function      : Get the tag and get the symbol from cft.
+ *
+ *  Arguments     :
+ *  range(in)     : pointer to Range struct that contain upper and lower range.
+ *  tag(in)       : 32 bit tag used to decode symbol.
+ *  cft(in)       : table that contain symbol.
+ *  tableSize(in) : Size for the cft.
+ *  out(out)      : Use to store the decoded symbol.
+ *  A/ B (in)     : temp variables to calculate an value and compare to cum_Freq in cft.
+ *
+ *  return
+ *  decodeSymbol  : to return the symbol decoded.
+ */
 char getSymbolFromTag(Range *range, uint32 *tag, CFT *cft, int tableSize, Stream *out){
   uint64 A, B;
   uint32 totalCount = cft[tableSize-1].cum_Freq;
   int tablePtr = 0;
   char decodeSymbol;
-  
   A = (*tag - range->lower + 1);
   A = (A * totalCount) - 1;
   B = (uint64)range->upper - range->lower + 1;
@@ -18,7 +31,6 @@ char getSymbolFromTag(Range *range, uint32 *tag, CFT *cft, int tableSize, Stream
     if(A < cft[tablePtr].cum_Freq){
       streamWriteByte(out,cft[tablePtr].symbol,8);
       decodeSymbol = cft[tablePtr].symbol;
-      printf("%c\n",decodeSymbol);
       break;
     }
     tablePtr = tablePtr + 1;
@@ -26,6 +38,21 @@ char getSymbolFromTag(Range *range, uint32 *tag, CFT *cft, int tableSize, Stream
   return decodeSymbol;
 }
 
+/*  decoderScaling
+ *  Function          : To renew the upper/ lower range and tag based on E1,E2,E3 condition
+ *                      3 scales -> E1, E2, E3
+ *                      E1-> MSB of upper/lower are 0
+ *                      E2-> MSB of upper/lower are 1
+ *                      E3-> 1st and 2nd MSB of upper/lower are 10/01
+ *
+ *  Arguments
+ *  tag(in)           : store the 32 bit tag
+ *  range(in/out)     : The current range with current upper limit and lower limit
+ *  in(in)            : File that store tag
+ *  upLimit(in)       : Used as mask to determine upper fulfill E1/E2 scaling condition
+ *  lowLimit(in)      : Used as mask to determine lower fulfill E1/E2 scaling condition
+ *  e3Up/e3Low(in)    : Used as mask to determine upper/lower fulfill E3 scaling condition
+ */
 void decoderScaling(Range *range, uint32 *tag, Stream *in){
   uint32 upLimit = maskMSB(range->upper), lowLimit = maskMSB(range->lower);
   uint32 e3Up = e3Mask(range->upper), e3Low = e3Mask(range->lower);
@@ -48,19 +75,41 @@ void decoderScaling(Range *range, uint32 *tag, Stream *in){
   }
 }
 
-// void arithmeticDecode(int dataLength, uint32 *tag, CFT *cft, int tableSize, Stream *out, Stream *in){
-  // char decodeSymbol;
-  // int success;
-  // Range* range;
-  // range = rangeNew();
+/*  arithmeticDecode
+ *  Function        : Decode tag and retrieve data
+ *  
+ *  How             : 1. Initialize upper and lower of range with 0xFFFFFFFF and 0
+ *                    2. Try to decode the first symbol. If success, dataLength minus 1
+ *                    3. Repeat the decode process again.
+ *                    4. The ranges and tag are updating after decode process
+ *                    5. Stop when dataLength equal to 0.
+ *  
+ *  Arguments
+ *  dataLength(in)    : The length of data after decode process
+ *  tag(in)           : Store 32 bit value, used for decode
+ *  cft(in)           : cft store the symbol and used for decode
+ *  tableSize(in)     : Size of cft
+ *  in(in)            : File store the tag
+ *  out(out)          : File store the decoded symbol
+ *  decodedSymbol(in) : Store the return symbol from getSymbolFromTag
+ *  success(in)       : To record the decode process is success or not
+ */
+void arithmeticDecode(int dataLength, uint32 *tag, CFT *cft, int tableSize, Stream *out, Stream *in){
+  char decodeSymbol;
+  int success;
+  Range* range;
+  range = rangeNew();
   
-  // while(dataLength != 0){
-    // success = 0;
-    // decodeSymbol = getSymbolFromTag(range, tag, cft, tableSize, out);
-    // if(decodeSymbol != '\0')
-      // success = 1;
-    // dataLength = dataLength - success;
-    // getRangeOfSymbol(range, decodeSymbol, cft, tableSize);
-    // decoderScaling(range, tag, in);
-  // }
-// }
+  while(dataLength != 0){
+    //printf("Data length before : %d \n", dataLength);
+    success = 0;
+    decodeSymbol = getSymbolFromTag(range, tag, cft, tableSize, out);
+    if(decodeSymbol != '\0')
+      success = 1;
+    dataLength = dataLength - success;
+    //printf("Decoded symbol : %c \n", decodeSymbol);
+    //printf("Data length after : %d \n", dataLength);
+    getRangeOfSymbol(range, decodeSymbol, cft, tableSize);
+    decoderScaling(range, tag, in);
+  }
+}
