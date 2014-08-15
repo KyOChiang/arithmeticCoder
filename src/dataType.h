@@ -8,11 +8,12 @@
 #define uint64 unsigned long long
 
 typedef enum { NO_ERROR,
-               ERR_END_OF_FILE
+               ERR_END_OF_FILE,
+               ERR_FILE_NOT_EXIST
 } ExceptionError;
 
 /*  Define keyword
- *  
+ *
  *  maskMSB           : To mask the 1st MSB of value
  *  e3Mask            : To mask the 1st and 2nd MSB of upper and lower in range
  *  MSB10             : IS a must that 1st and 2nd MSB of upper must be "10...." for E3 Scaling

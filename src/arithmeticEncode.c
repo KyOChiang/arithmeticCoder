@@ -15,10 +15,10 @@ void dumpRange(Range *range){
 }
 
 /*  cftNew
- *  
+ *
  *  Function          : Create new cumulative frequencies table (cft) by reading the char one by one
- *  
- *  How               : 1. Check if there got char or not. 
+ *
+ *  How               : 1. Check if there got char or not.
  *                         If char there, start to get 1 symbol. Otherwise, return exception error.
  *                      2. Check first index in table, is that empty or occupy by char.
  *                         If not empty, compare the char and the symbol. If same, occurNo plus 1
@@ -28,13 +28,13 @@ void dumpRange(Range *range){
  *                           cft[x].cum_Freq = cft[x-1].cum_Freq + cft[x].occurNo
  *                      5. Return the pointer that point to the created table.
  *
- *  Arguments   
+ *  Arguments
  *  in(in)            : Txt file contain characters and symbols
  *  t_Size(out)       : size of cft table
  *  t_Ptr(in)         : index pointer for cft
  *  loop(in)          : Help to stop searching table if it is 1
  *  keepGetSymbol(in) : Help to stop retrieve the next symbol if end of char
- *  getSymbol(in)     : Use to store the return char from streamReadBit
+ *  getSymbol(in)     : Use to store the return char from streamReadBits
  *
  *  return
  *  cft             : a pointer to the created cft
@@ -44,10 +44,10 @@ CFT *cftNew(Stream *in){
   char getSymbol;
   CEXCEPTION_T error;
   CFT *cft = calloc(sizeof(CFT),256);
-  
+
   while(keepGetSymbol){
     Try{
-      getSymbol = streamReadBit(in, 8);
+      getSymbol = streamReadBits(in, 8);
     }Catch(error){
       keepGetSymbol = 0;
     }
@@ -78,30 +78,30 @@ CFT *cftNew(Stream *in){
     else
       cft[t_Ptr].cum_Freq = cft[t_Ptr-1].cum_Freq + cft[t_Ptr].occurNo;
   }
-  
+
   return cft;
 }
 
 /*  rangeNew
  *  Function : To initialize a new range.
- *  
+ *
  *  return
  *  newRange : New range with lower = 0, upper = 0xFFFFFFFFL
  */
 Range *rangeNew(){
   Range* newRange = malloc(sizeof(Range));
-  
+
   newRange->upper = 0xFFFFFFFFL;
   newRange->lower = 0;
   newRange->scale3 = 0;
   //dumpRange(newRange);
-  
+
   return newRange;
 }
 
 /*  getRangeOfSymbol
  *  Function    : To get the new interval of a symbol
- *  
+ *
  *  Arguments
  *  range(in/out)     : The current range with current upper limit and lower limit
  *  symbol(in)        : The input symbol required to get upper and lower limit
@@ -118,17 +118,17 @@ void getRangeOfSymbol(Range *range, char symbol, CFT *cft,int tableSize){
   int tbPtr;
   uint64 rangeDiff, tempL, tempU;
   uint32 low_Count, up_Count, total_Count;
-  
+
   rangeDiff = ((uint64)range->upper - range->lower) + 1;
   total_Count = cft[tableSize-1].cum_Freq;
-  
+
   for(tbPtr = 0; tbPtr < tableSize; tbPtr++){
     if(symbol == cft[tbPtr].symbol){
       if(tbPtr == 0)
         low_Count = 0;
       else
         low_Count = cft[tbPtr-1].cum_Freq;
-        
+
       up_Count = cft[tbPtr].cum_Freq;
       break;
     }
@@ -136,12 +136,12 @@ void getRangeOfSymbol(Range *range, char symbol, CFT *cft,int tableSize){
   tempL = (rangeDiff * low_Count);
   tempL = tempL / total_Count;
   tempL = tempL + range->lower;
-  
+
   tempU = (rangeDiff * up_Count);
   tempU = tempU / total_Count;
   tempU = tempU + range->lower;
   tempU = tempU - 1;
-  
+
   range->lower = tempL;
   range->upper = tempU;
 }
@@ -169,7 +169,7 @@ void encoderScaling(Range *range, Stream *out){
   int transmitBit;
   uint32 upLimit = maskMSB(range->upper), lowLimit = maskMSB(range->lower);
   uint32 e3Up = e3Mask(range->upper), e3Low = e3Mask(range->lower);
-  
+
   while((upLimit == lowLimit)||((e3Up == MSB10) && (e3Low == MSB01))){
     if(upLimit == lowLimit){                          // E1 || E2 condition
       if(upLimit == 0 && lowLimit == 0){
@@ -180,7 +180,7 @@ void encoderScaling(Range *range, Stream *out){
         transmitBit = 1;
         streamWriteBit(out,transmitBit);
       }
-      range->upper = shiftToLeftBy1Bit(range->upper) + 1; 
+      range->upper = shiftToLeftBy1Bit(range->upper) + 1;
       range->lower = shiftToLeftBy1Bit(range->lower);
       while(range->scale3 > 0){
         streamWriteBit(out,!transmitBit);
@@ -189,7 +189,7 @@ void encoderScaling(Range *range, Stream *out){
     }
     if((e3Up == MSB10) && (e3Low == MSB01)){          // E3 condition
       range->scale3 = range->scale3 + 1;
-      range->upper = shiftToLeftBy1Bit(range->upper) + 1; 
+      range->upper = shiftToLeftBy1Bit(range->upper) + 1;
       range->lower = shiftToLeftBy1Bit(range->lower);
       range->upper = complementMSB(range->upper);
       range->lower = complementMSB(range->lower);
@@ -201,7 +201,7 @@ void encoderScaling(Range *range, Stream *out){
 
 /*  andMask32bit
  *  Function : Mask 32 unsigned int with 0x8000 0000
- *  
+ *
  *  Argument
  *  range(in) : Contain the upper and lower.
  */
@@ -236,7 +236,7 @@ void arithmeticEncode(char *dataPtr, int dataLength, CFT *cft, int tableSize, St
   uint32 lowTransmit;
   Range* range;
   range = rangeNew();
-  
+
   while(dataLength != 0){
     getRangeOfSymbol(range, dataPtr[arrayPtr], cft, tableSize);
     // dumpRange(range);
@@ -245,13 +245,13 @@ void arithmeticEncode(char *dataPtr, int dataLength, CFT *cft, int tableSize, St
     dataLength = dataLength - 1;
   }
   lowTransmit = range->lower;
-  
+
   while(lowTransmitCount!=0){
     if(maskMSB(lowTransmit) == 0x80000000)
       streamWriteBit(out,1);
     else
       streamWriteBit(out,0);
-    
+
     while(range->scale3 > 0){
       streamWriteBit(out,1);
       range->scale3 = range->scale3 - 1;

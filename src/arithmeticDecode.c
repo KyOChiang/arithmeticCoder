@@ -58,14 +58,14 @@ void decoderScaling(Range *range, uint32 *tag, Stream *in){
   uint32 e3Up = e3Mask(range->upper), e3Low = e3Mask(range->lower);
   while((upLimit == lowLimit)||((e3Up == MSB10) && (e3Low == MSB01))){
     if(upLimit == lowLimit){                          // E1 || E2 condition
-      range->upper = shiftToLeftBy1Bit(range->upper) + 1; 
+      range->upper = shiftToLeftBy1Bit(range->upper) + 1;
       range->lower = shiftToLeftBy1Bit(range->lower);
-      *tag = shiftToLeftBy1Bit(*tag) | streamReadBit(in, 1);
+      *tag = shiftToLeftBy1Bit(*tag) | streamReadBits(in, 1);
     }
     if((e3Up == MSB10) && (e3Low == MSB01)){          // E3 condition
-      range->upper = shiftToLeftBy1Bit(range->upper) + 1; 
+      range->upper = shiftToLeftBy1Bit(range->upper) + 1;
       range->lower = shiftToLeftBy1Bit(range->lower);
-      *tag = shiftToLeftBy1Bit(*tag) | streamReadBit(in, 1);
+      *tag = shiftToLeftBy1Bit(*tag) | streamReadBits(in, 1);
       range->upper = complementMSB(range->upper);
       range->lower = complementMSB(range->lower);
       *tag = complementMSB(*tag);
@@ -77,13 +77,13 @@ void decoderScaling(Range *range, uint32 *tag, Stream *in){
 
 /*  arithmeticDecode
  *  Function        : Decode tag and retrieve data
- *  
+ *
  *  How             : 1. Initialize upper and lower of range with 0xFFFFFFFF and 0
  *                    2. Try to decode the first symbol. If success, dataLength minus 1
  *                    3. Repeat the decode process again.
  *                    4. The ranges and tag are updating after decode process
  *                    5. Stop when dataLength equal to 0.
- *  
+ *
  *  Arguments
  *  dataLength(in)    : The length of data after decode process
  *  tag(in)           : Store 32 bit value, used for decode
@@ -99,7 +99,7 @@ void arithmeticDecode(int dataLength, uint32 *tag, CFT *cft, int tableSize, Stre
   int success;
   Range* range;
   range = rangeNew();
-  
+
   while(dataLength != 0){
     //printf("Data length before : %d \n", dataLength);
     success = 0;

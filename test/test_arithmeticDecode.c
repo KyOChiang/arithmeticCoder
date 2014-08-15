@@ -53,7 +53,7 @@ void test_decoderScaling_should_perform_E1_scaling_operation(){
   Range* range = rangeNew();
   Stream in;
   range->upper = 0x7FFFFFFF;
-  streamReadBit_ExpectAndReturn(&in, 1, 1);
+  streamReadBits_ExpectAndReturn(&in, 1, 1);
   decoderScaling(range, &tag, &in);
   TEST_ASSERT_EQUAL_UINT32(0xFFFFFFFF,range->upper);
   TEST_ASSERT_EQUAL_UINT32(0x00000000,range->lower);
@@ -65,7 +65,7 @@ void test_decoderScaling_should_perform_E2_scaling_operation(){
   Range* range = rangeNew();
   Stream in;
   range->lower = 0x80000000;
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
   decoderScaling(range, &tag, &in);
   TEST_ASSERT_EQUAL_UINT32(0xFFFFFFFF,range->upper);
   TEST_ASSERT_EQUAL_UINT32(0x00000000,range->lower);
@@ -78,7 +78,7 @@ void test_decoderScaling_should_perform_E3_scaling_operation(){
   Stream in;
   range->upper = 0xBFFFFFFF;
   range->lower = 0x40FFFFFF;
-  streamReadBit_ExpectAndReturn(&in, 1, 1);
+  streamReadBits_ExpectAndReturn(&in, 1, 1);
   decoderScaling(range, &tag, &in);
   TEST_ASSERT_EQUAL_UINT32(0xFFFFFFFF,range->upper);
   TEST_ASSERT_EQUAL_UINT32(0x01FFFFFE,range->lower);
@@ -95,19 +95,19 @@ void test_arithmeticDecode_with_tag_should_return_1321(){
   CFT cft[] = {{.symbol = '1', .cum_Freq = 40},
                {.symbol = '2', .cum_Freq = 41},
                {.symbol = '3', .cum_Freq = 50}};
-  
+
   streamWriteByte_ExpectAndReturn(&out,cft[0].symbol,8, 8);
   streamWriteByte_ExpectAndReturn(&out,cft[2].symbol,8, 16);
-  streamReadBit_ExpectAndReturn(&in, 1, 1);
-  streamReadBit_ExpectAndReturn(&in, 1, 1);
+  streamReadBits_ExpectAndReturn(&in, 1, 1);
+  streamReadBits_ExpectAndReturn(&in, 1, 1);
   streamWriteByte_ExpectAndReturn(&out,cft[1].symbol,8, 24);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
   streamWriteByte_ExpectAndReturn(&out,cft[0].symbol,8, 32);
-  
+
   arithmeticDecode(dataLength, &tag, cft, t_Size, &out, &in);
   //Tag: 1100 0101 0110 1101 0101 1100 1111 1001 1100 000
 }
@@ -119,17 +119,17 @@ void test_arithmeticDecode_with_tag_on_different_cft_should_return_1321(){
   CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
                {.symbol = '2', .cum_Freq = 40},
                {.symbol = '3', .cum_Freq = 50}};
-  
+
   streamWriteByte_ExpectAndReturn(&out,cft[0].symbol,8, 8);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
   streamWriteByte_ExpectAndReturn(&out,cft[2].symbol,8, 16);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
   streamWriteByte_ExpectAndReturn(&out,cft[1].symbol,8, 24);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
   streamWriteByte_ExpectAndReturn(&out,cft[0].symbol,8, 32);
-  streamReadBit_ExpectAndReturn(&in, 1, 0);
-  
+  streamReadBits_ExpectAndReturn(&in, 1, 0);
+
   arithmeticDecode(dataLength, &tag, cft, t_Size, &out, &in);
   //Tag: 0111 0011 0011 0011 0011 0011 0011 0011 0000 0
 }
