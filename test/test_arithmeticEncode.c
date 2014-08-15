@@ -349,22 +349,23 @@ void test_encoderScaling_for_E3_E3_E3_E2_E2_should_do_the_scaling(){
 ///////////////////////////
 // arithmeticEncode
 //////////////////////////
-void test_arithmeticEncode_should_perform_encoding_process_on_symbol_1321_and_create_a_tag(){
+/*void test_arithmeticEncode_should_perform_encoding_process_on_symbol_1321_and_create_a_tag(){
   int dataLength = 4, t_Size = 3;
-  char symbol[] = "1321";
-  char *dataPtr;
-  dataPtr = symbol;
   CFT cft[] = {{.symbol = '1', .cum_Freq = 25},
                {.symbol = '2', .cum_Freq = 40},
                {.symbol = '3', .cum_Freq = 50}};
 
-  Stream out;
-
+  Stream out, in;
+  streamReadBits_ExpectAndReturn(&in,8,'1');
   streamWriteBit_ExpectAndReturn(&out,0,1);
+  streamReadBits_ExpectAndReturn(&in,8,'3');
   streamWriteBit_ExpectAndReturn(&out,1,2);
   streamWriteBit_ExpectAndReturn(&out,1,3);
+  streamReadBits_ExpectAndReturn(&in,8,'2');
   streamWriteBit_ExpectAndReturn(&out,1,4);
+  streamReadBits_ExpectAndReturn(&in,8,'1');
   streamWriteBit_ExpectAndReturn(&out,0,5);
+  streamReadBits_ExpectAndThrow(&in,8,ERR_END_OF_FILE);
 
   streamWriteBit_ExpectAndReturn(&out,0,6);
   streamWriteBit_ExpectAndReturn(&out,1,7);
@@ -405,26 +406,28 @@ void test_arithmeticEncode_should_perform_encoding_process_on_symbol_1321_and_cr
   streamWriteBit_ExpectAndReturn(&out,0,3);
   streamWriteBit_ExpectAndReturn(&out,0,4);
   streamWriteBit_ExpectAndReturn(&out,0,5);
-  arithmeticEncode(dataPtr, dataLength, cft, t_Size, &out);
-}
+  arithmeticEncode(&in, cft, t_Size, &out);
+}*/
 
 void test_arithmeticEncode_should_perform_encoding_process_with_another_CFT_on_symbol_1321_and_create_a_tag(){
   int dataLength = 4, t_Size = 3;
-  char symbol[] = "1321";
-  char *dataPtr;
-  dataPtr = symbol;
   CFT cft[] = {{.symbol = '1', .cum_Freq = 40},
                {.symbol = '2', .cum_Freq = 41},
                {.symbol = '3', .cum_Freq = 50}};
 
-  Stream out;
-
+  Stream out, in;
+  
+  streamReadBits_ExpectAndReturn(&in,8,'1');
+  streamReadBits_ExpectAndReturn(&in,8,'3');
   streamWriteBit_ExpectAndReturn(&out,1,1);
+  streamReadBits_ExpectAndReturn(&in,8,'2');
   streamWriteBit_ExpectAndReturn(&out,1,2);
   streamWriteBit_ExpectAndReturn(&out,0,3);
   streamWriteBit_ExpectAndReturn(&out,0,4);
   streamWriteBit_ExpectAndReturn(&out,0,5);
   streamWriteBit_ExpectAndReturn(&out,1,6);
+  streamReadBits_ExpectAndReturn(&in,8,'1');
+  streamReadBits_ExpectAndThrow(&in, 8, ERR_END_OF_FILE);
 
   streamWriteBit_ExpectAndReturn(&out,0,7);
   streamWriteBit_ExpectAndReturn(&out,1,8);
@@ -466,26 +469,28 @@ void test_arithmeticEncode_should_perform_encoding_process_with_another_CFT_on_s
   streamWriteBit_ExpectAndReturn(&out,0,5);
   streamWriteBit_ExpectAndReturn(&out,0,6);
   streamWriteBit_ExpectAndReturn(&out,0,7);
-  arithmeticEncode(symbol, dataLength, cft, t_Size, &out);
+  arithmeticEncode(&in, cft, t_Size, &out);
 }
-
+// Even this is a redundant test, just to find out alphabet symbol can work or not.
 void test_arithmeticEncode_should_perform_encoding_process_on_symbol_acba_and_create_a_tag(){
   int dataLength = 4, t_Size = 3;
-  char symbol[] = "acba";
-  char *dataPtr;
-  dataPtr = symbol;
   CFT cft[] = {{.symbol = 'a', .cum_Freq = 40},
                {.symbol = 'b', .cum_Freq = 41},
                {.symbol = 'c', .cum_Freq = 50}};
 
-  Stream out;
+  Stream in, out;
 
+  streamReadBits_ExpectAndReturn(&in,8,'a');
+  streamReadBits_ExpectAndReturn(&in,8,'c');
   streamWriteBit_ExpectAndReturn(&out,1,1);
+  streamReadBits_ExpectAndReturn(&in,8,'b');
   streamWriteBit_ExpectAndReturn(&out,1,2);
   streamWriteBit_ExpectAndReturn(&out,0,3);
   streamWriteBit_ExpectAndReturn(&out,0,4);
   streamWriteBit_ExpectAndReturn(&out,0,5);
   streamWriteBit_ExpectAndReturn(&out,1,6);
+  streamReadBits_ExpectAndReturn(&in,8,'a');
+  streamReadBits_ExpectAndThrow(&in, 8, ERR_END_OF_FILE);
 
   streamWriteBit_ExpectAndReturn(&out,0,7);
   streamWriteBit_ExpectAndReturn(&out,1,8);
@@ -527,7 +532,7 @@ void test_arithmeticEncode_should_perform_encoding_process_on_symbol_acba_and_cr
   streamWriteBit_ExpectAndReturn(&out,0,5);
   streamWriteBit_ExpectAndReturn(&out,0,6);
   streamWriteBit_ExpectAndReturn(&out,0,7);
-  arithmeticEncode(symbol, dataLength, cft, t_Size, &out);
+  arithmeticEncode(&in, cft, t_Size, &out);
 }
 
 ///////////////////////////

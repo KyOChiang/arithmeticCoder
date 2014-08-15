@@ -121,7 +121,7 @@ void getRangeOfSymbol(Range *range, char symbol, CFT *cft,int tableSize){
 
   rangeDiff = ((uint64)range->upper - range->lower) + 1;
   total_Count = cft[tableSize-1].cum_Freq;
-
+  // printf("Symbol : %c\n",symbol);
   for(tbPtr = 0; tbPtr < tableSize; tbPtr++){
     if(symbol == cft[tbPtr].symbol){
       if(tbPtr == 0)
@@ -214,16 +214,15 @@ void andMask32bit(Range *range){
  *  Function          : Encode data into tag
  *
  *  How               : 1. Initialize upper and lower of range with 0xFFFFFFFF and 0
- *                      2. If not EOF(replaced by number of inputs->dataLength)
+ *                      2. If not EOF, will checking by streamReadBits and throw exception if EOF
  *                         Update the range->upper and range->lower(probability range for the symbol)
  *                      3. Perform the E1/E2/E3 scaling if necessary
- *                      4. Update the arrayPtr and dataLength and start over from step 2 again
+ *                      4. Grab the next symbol and start over from step 2 again
  *                      5. If EOF, store the range->lower to lowTransmit, shift the 1st MSB and send out
  *                      6. Check scale3, if zero, transmit out all the remaining bits of lowTransmit
  *                         Else, send out 1 and decrease the scale3 by 1
  *  Arguments
- *  dataPtr(in)           : A pointer point to an array that store symbol
- *  dataLength(in)        : Total size of an array that store symbol
+ *  in(in)                : The input file contain symbols being encoded
  *  cft(in)               : Cumulative Freq.(CF) Table that store symbol and their own CF
  *  tableSize(in)         : The size of CFT
  *  out(out)              : To store the transmit message (encode value)
@@ -231,18 +230,23 @@ void andMask32bit(Range *range){
  *  lowTransmitCount(in)  : Total times to transmit the last range->lower
  *  lowTransmit(in)       : Temporary store range->lower and use for shift and MSB check
  */
-void arithmeticEncode(char *dataPtr, int dataLength, CFT *cft, int tableSize, Stream *out){
+void arithmeticEncode(Stream *in, CFT *cft, int tableSize, Stream *out){
   int arrayPtr = 0, lowTransmitCount = 32;
+  CEXCEPTION_T error;
   uint32 lowTransmit;
+  int charReturn, encodeDone = 0;
   Range* range;
   range = rangeNew();
-
-  while(dataLength != 0){
-    getRangeOfSymbol(range, dataPtr[arrayPtr], cft, tableSize);
-    // dumpRange(range);
-    encoderScaling(range,out);
-    arrayPtr = arrayPtr + 1;
-    dataLength = dataLength - 1;
+  while(!encodeDone){
+    Try{
+      charReturn = streamReadBits(in,8);
+      // printf("%c\n",charReturn);
+      getRangeOfSymbol(range, charReturn, cft, tableSize);
+      // dumpRange(range);
+      encoderScaling(range,out);
+    }Catch(error){
+      encodeDone = 1;
+    }
   }
   lowTransmit = range->lower;
 
