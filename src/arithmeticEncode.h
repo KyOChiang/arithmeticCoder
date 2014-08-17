@@ -16,12 +16,16 @@ typedef struct{
 }CFT;
 
 void dumpRange(Range *range);
+void dumpCFT(CFT* cft, int index);
+
+CFT *cftNew(Stream *in, int* tableSize);
 Range *rangeNew();
+
 void rangeDel(Range *range);
+void andMask32bit(Range *range);
+
 void getRangeOfSymbol(Range *range, char symbol, CFT *cft,int tableSize);
 void encoderScaling(Range *range, Stream *out);
-void andMask32bit(Range *range);
-void arithmeticEncode(Stream *in, CFT *cft, int tableSize, Stream *out);
-CFT *cftNew(Stream *in);
+void arithmeticEncode(Stream *in, int *dataLength, CFT *cft, int tableSize, Stream *out);
 
 #endif

@@ -1,8 +1,33 @@
-#include <stdio.h>
-#include <malloc.h>
-#include "arithmeticEncode.h"
 #include "arithmeticDecode.h"
-#include "dataType.h"
+
+/*  tagReader
+ *  Function : To read in the first 32 bit of tag value
+ *
+ *  Arguments
+ *  in(in)              : Contain the info of tag
+ *  tag(out)            : Use to store the tag value
+ *  tagModify(in)       : Use to get 1 byte tag value before shifting
+ *  tagPlus(out)        : To store the tag value after shifting
+ *  shiftMultiplier(in) : To shift the tagModify to proper location
+ */
+void tagReader(Stream *in, uint32 *tag){
+  uint32 tagModify, tagPlus = 0;
+  int shiftMultiplier = 4;
+  CEXCEPTION_T error;
+  while(shiftMultiplier!=0){
+    Try{
+      tagModify = streamReadBits(in,8);
+      tagModify = tagModify<<(8*(shiftMultiplier - 1));
+      tagPlus = tagPlus | tagModify;
+      shiftMultiplier = shiftMultiplier - 1;
+      in->byteIndex = in->byteIndex + 1;
+    }Catch(error){
+      shiftMultiplier == 0;
+    }
+  }
+  // printf("Tag : %x\n",tagPlus);
+  *(tag) = tagPlus;
+}
 
 /*  getSymbolFromTag
  *  Function      : Get the tag and get the symbol from cft.
@@ -29,7 +54,7 @@ char getSymbolFromTag(Range *range, uint32 *tag, CFT *cft, int tableSize, Stream
   A = A / B;
   while(tablePtr < tableSize){
     if(A < cft[tablePtr].cum_Freq){
-      streamWriteByte(out,cft[tablePtr].symbol,8);
+      streamWriteByte(out,cft[tablePtr].symbol);
       decodeSymbol = cft[tablePtr].symbol;
       break;
     }
@@ -112,4 +137,5 @@ void arithmeticDecode(int dataLength, uint32 *tag, CFT *cft, int tableSize, Stre
     getRangeOfSymbol(range, decodeSymbol, cft, tableSize);
     decoderScaling(range, tag, in);
   }
+  rangeDel(range);
 }
