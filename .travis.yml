@@ -2,4 +2,4 @@ language: c
 compiler:
   - gcc
   - clang
-script: rake test:all
+script: rake clobber test:all

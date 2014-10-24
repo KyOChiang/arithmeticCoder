@@ -4,15 +4,11 @@
 #include <stdio.h>
 #include "CException.h"
 #include <malloc.h>
+#include <Error.h>
 
 #define uint32 unsigned int
 #define uint64 unsigned long long
 #define uint8 unsigned char
-
-typedef enum { NO_ERROR,
-               ERR_END_OF_FILE,
-               ERR_FILE_NOT_EXIST
-} ExceptionError;
 
 /*  Define keyword
  *
@@ -29,7 +25,7 @@ typedef enum { NO_ERROR,
 #define e3Mask(x) (x & 0xC0000000)
 #define MSB10 0x80000000
 #define MSB01 0x40000000
-#define shiftToLeftBy1Bit(x) (x<<1)
+#define shiftToLeftBy1Bit(x) (x<<=1)
 #define complementMSB(x) (x ^ 0x80000000)
 
 #endif

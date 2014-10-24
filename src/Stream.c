@@ -119,10 +119,9 @@ void streamWriteBit(Stream *out, int inputBit){
   out->currentByte = out->currentByte | inputBit;
   out->buffer = &(out->currentByte);
   out->bitIndex = out->bitIndex + 1;
-  if(out->bitIndex == 8){
+  // printf("bitIndex: %d\n",out->bitIndex);
+  if(out->bitIndex == 8)
     streamFlush(out);
-    out->bitIndex = 0;
-  }
 }
 
 /*  streamWriteByte
@@ -146,6 +145,7 @@ void streamWriteByte(Stream *out, char decodeSymbol){
 void streamFlush(Stream *out){
   //printf("Flush out : %d\n",*(out->buffer));
   fputc(*(out->buffer),out->file);
+  out->bitIndex = 0;
 }
 
 

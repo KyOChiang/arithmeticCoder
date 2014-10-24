@@ -356,6 +356,7 @@ void test_arithmeticEncode_should_perform_encoding_process_on_symbol_1321_and_cr
                {.symbol = '3', .cum_Freq = 50}};
 
   Stream out, in;
+  out.bitIndex = 0;
   streamReadBits_ExpectAndReturn(&in,8,'1');
   streamWriteBit_Expect(&out,0);
   streamReadBits_ExpectAndReturn(&in,8,'3');
@@ -406,7 +407,6 @@ void test_arithmeticEncode_should_perform_encoding_process_on_symbol_1321_and_cr
   streamWriteBit_Expect(&out,0);
   streamWriteBit_Expect(&out,0);
   streamWriteBit_Expect(&out,0);
-  streamFlush_Expect(&out);
   arithmeticEncode(&in, &dataLength, cft, t_Size, &out);
   TEST_ASSERT_EQUAL(4,dataLength);
 }
@@ -418,7 +418,7 @@ void test_arithmeticEncode_should_perform_encoding_process_with_another_CFT_on_s
                {.symbol = '3', .cum_Freq = 50}};
 
   Stream out, in;
-
+  out.bitIndex = 0;
   streamReadBits_ExpectAndReturn(&in,8,'1');
   streamReadBits_ExpectAndReturn(&in,8,'3');
   streamWriteBit_Expect(&out,1);
@@ -471,7 +471,6 @@ void test_arithmeticEncode_should_perform_encoding_process_with_another_CFT_on_s
   streamWriteBit_Expect(&out,0);
   streamWriteBit_Expect(&out,0);
   streamWriteBit_Expect(&out,0);
-  streamFlush_Expect(&out);
   arithmeticEncode(&in, &dataLength, cft, t_Size, &out);
   TEST_ASSERT_EQUAL(4,dataLength);
 }
@@ -484,7 +483,7 @@ void test_arithmeticEncode_should_perform_encoding_process_on_symbol_acba_and_cr
                {.symbol = 'c', .cum_Freq = 50}};
 
   Stream in, out;
-
+  out.bitIndex = 0;
   streamReadBits_ExpectAndReturn(&in,8,'a');
   streamReadBits_ExpectAndReturn(&in,8,'c');
   streamWriteBit_Expect(&out,1);
@@ -537,7 +536,6 @@ void test_arithmeticEncode_should_perform_encoding_process_on_symbol_acba_and_cr
   streamWriteBit_Expect(&out,0);
   streamWriteBit_Expect(&out,0);
   streamWriteBit_Expect(&out,0);
-  streamFlush_Expect(&out);
   arithmeticEncode(&in, &dataLength, cft, t_Size, &out);
   TEST_ASSERT_EQUAL(4,dataLength);
 }

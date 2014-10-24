@@ -143,13 +143,13 @@ void getRangeOfSymbol(Range *range, char symbol, CFT *cft,int tableSize){
     }
   }
   tempL = (rangeDiff * low_Count);
-  tempL = tempL / total_Count;
-  tempL = tempL + range->lower;
+  tempL /= total_Count;
+  tempL += range->lower;
 
   tempU = (rangeDiff * up_Count);
-  tempU = tempU / total_Count;
-  tempU = tempU + range->lower;
-  tempU = tempU - 1;
+  tempU /= total_Count;
+  tempU += range->lower;
+  tempU -= 1;
 
   range->lower = tempL;
   range->upper = tempU;
@@ -189,17 +189,19 @@ void encoderScaling(Range *range, Stream *out){
         transmitBit = 1;
         streamWriteBit(out,transmitBit);
       }
-      range->upper = shiftToLeftBy1Bit(range->upper) + 1;
-      range->lower = shiftToLeftBy1Bit(range->lower);
+      shiftToLeftBy1Bit(range->upper);
+      range->upper += 1;
+      shiftToLeftBy1Bit(range->lower);
       while(range->scale3 > 0){
         streamWriteBit(out,!transmitBit);
-        range->scale3 = range->scale3 - 1;
+        range->scale3 -= 1;
       }
     }
     if((e3Up == MSB10) && (e3Low == MSB01)){          // E3 condition
-      range->scale3 = range->scale3 + 1;
-      range->upper = shiftToLeftBy1Bit(range->upper) + 1;
-      range->lower = shiftToLeftBy1Bit(range->lower);
+      range->scale3 += 1;
+      shiftToLeftBy1Bit(range->upper);
+      range->upper += 1;
+      shiftToLeftBy1Bit(range->lower);
       range->upper = complementMSB(range->upper);
       range->lower = complementMSB(range->lower);
     }
@@ -227,8 +229,8 @@ void andMask32bit(Range *range){
  *                         Update the range->upper and range->lower(probability range for the symbol)
  *                      3. Perform the E1/E2/E3 scaling if necessary
  *                      4. Grab the next symbol and start over from step 2 again
- *                      5. If EOF, store the range->lower to lowTransmit, shift the 1st MSB and send out
- *                      6. Check scale3, if zero, transmit out all the remaining bits of lowTransmit
+ *                      5. If EOF, store the range->lower to code, shift the 1st MSB and send out
+ *                      6. Check scale3, if zero, transmit out all the remaining bits of code
  *                         Else, send out 1 and decrease the scale3 by 1
  *  Arguments
  *  in(in)                : The input file contain symbols being encoded
@@ -237,47 +239,43 @@ void andMask32bit(Range *range){
  *  tableSize(in)         : The size of CFT
  *  out(out)              : To store the transmit message (encode value)
  *  arrayPtr(in)          : Use to point the location of data from start
- *  lowTransmitCount(in)  : Total times to transmit the last range->lower
- *  lowTransmit(in)       : Temporary store range->lower and use for shift and MSB check
+ *  bitLeft(in)           : Total times to transmit the last range->lower
+ *  code(in)              : Temporary store range->lower and use for shift and MSB check
  */
 void arithmeticEncode(Stream *in, int *dataLength, CFT *cft, int tableSize, Stream *out){
-  int arrayPtr = 0, lowTransmitCount = 32;
-  CEXCEPTION_T error;
-  uint32 lowTransmit;
-  int charReturn, encodeDone = 0;
-  Range* range;
+  int arrayPtr = 0, bitLeft = 32; CEXCEPTION_T error;
+  uint32 code; int data, encodeDone = 0; Range* range;
+  
   range = rangeNew();
   while(!encodeDone){
     Try{
-      charReturn = streamReadBits(in,8);
-      *(dataLength) = *(dataLength) + 1;
-      // printf("%c\n",charReturn);
-      getRangeOfSymbol(range, charReturn, cft, tableSize);
+      data = streamReadBits(in,8);
+      *dataLength += 1;
+      // printf("%c\n",data);
+      getRangeOfSymbol(range, data, cft, tableSize);
       // dumpRange(range);
       encoderScaling(range,out);
     }Catch(error){
       encodeDone = 1;
     }
   }
-  lowTransmit = range->lower;
+  code = range->lower;
 
-  while(lowTransmitCount!=0){
-    if(maskMSB(lowTransmit) == 0x80000000)
+  while(bitLeft!=0){
+    if(maskMSB(code) == 0x80000000)
       streamWriteBit(out,1);
     else
       streamWriteBit(out,0);
 
     while(range->scale3 > 0){
       streamWriteBit(out,1);
-      range->scale3 = range->scale3 - 1;
+      range->scale3 -= 1;
     }
-    lowTransmit = shiftToLeftBy1Bit(lowTransmit);
-    lowTransmitCount = lowTransmitCount - 1;
+    shiftToLeftBy1Bit(code);
+    bitLeft -= 1;
   }
-  if(out->bitIndex!=0){
+  if(out->bitIndex!=0)  //Not usable in mock code, since out->bitIndex only increment by 1 inside the mock function
     streamFlush(out);
-    out->bitIndex = 0;
-  }
   rangeDel(range);
 }
 

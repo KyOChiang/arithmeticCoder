@@ -124,7 +124,7 @@ void test_arithmeticDecoder_to_decode_tag_with_cftData_txt_should_generate_acba(
     in = openStream("tag.bin","r");
     out = openStream("decodedSymbol.txt","w");
     tagReader(in,&tag);
-    arithmeticDecode(dataLength, &tag, cftPtr, tableSize, out, in);
+    arithmeticDecode(&dataLength, &tag, cftPtr, tableSize, out, in);
   }Catch(error){
     TEST_ASSERT_NOT_EQUAL(ERR_FILE_NOT_EXIST,error);
   }
@@ -136,6 +136,7 @@ void test_arithmeticDecoder_to_decode_tag_with_cftData_txt_should_generate_acba(
   }if(cft != NULL){
     closeStream(cft);
   }
+  TEST_ASSERT_EQUAL(0,dataLength);
 }
 
 

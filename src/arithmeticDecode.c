@@ -119,21 +119,19 @@ void decoderScaling(Range *range, uint32 *tag, Stream *in){
  *  decodedSymbol(in) : Store the return symbol from getSymbolFromTag
  *  success(in)       : To record the decode process is success or not
  */
-void arithmeticDecode(int dataLength, uint32 *tag, CFT *cft, int tableSize, Stream *out, Stream *in){
+void arithmeticDecode(int *dataLength, uint32 *tag, CFT *cft, int tableSize, Stream *out, Stream *in){
   char decodeSymbol;
   int success;
   Range* range;
   range = rangeNew();
 
-  while(dataLength != 0){
-    //printf("Data length before : %d \n", dataLength);
+  while(*dataLength != 0){
     success = 0;
     decodeSymbol = getSymbolFromTag(range, tag, cft, tableSize, out);
     if(decodeSymbol != '\0')
       success = 1;
-    dataLength = dataLength - success;
+    *dataLength -= success;
     //printf("Decoded symbol : %c \n", decodeSymbol);
-    //printf("Data length after : %d \n", dataLength);
     getRangeOfSymbol(range, decodeSymbol, cft, tableSize);
     decoderScaling(range, tag, in);
   }

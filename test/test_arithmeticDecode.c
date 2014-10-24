@@ -111,7 +111,8 @@ void test_arithmeticDecode_with_tag_should_return_1321(){
   streamReadBits_ExpectAndReturn(&in, 1, 0);
   streamWriteByte_Expect(&out,cft[0].symbol);
 
-  arithmeticDecode(dataLength, &tag, cft, t_Size, &out, &in);
+  arithmeticDecode(&dataLength, &tag, cft, t_Size, &out, &in);
+  TEST_ASSERT_EQUAL(0,dataLength);
   //Tag: 1100 0101 0110 1101 0101 1100 1111 1001 1100 000
 }
 
@@ -133,7 +134,8 @@ void test_arithmeticDecode_with_tag_on_different_cft_should_return_1321(){
   streamWriteByte_Expect(&out,cft[0].symbol);
   streamReadBits_ExpectAndReturn(&in, 1, 0);
 
-  arithmeticDecode(dataLength, &tag, cft, t_Size, &out, &in);
+  arithmeticDecode(&dataLength, &tag, cft, t_Size, &out, &in);
+  TEST_ASSERT_EQUAL(0,dataLength);
   //Tag: 0111 0011 0011 0011 0011 0011 0011 0011 0000 0
 }
 
