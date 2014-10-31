@@ -133,6 +133,37 @@ void test_arithmeticEncoder_to_encode_lengthy_string_txt_should_generate_a_tag()
   }
 }
 
+void test_arithmeticEncoder_to_encode_object_file_should_generate_a_tag(){
+  Stream *cft = NULL, *in = NULL, *out = NULL;
+  CFT *cftPtr;
+  int dataLength = 0, tableSize;
+  CEXCEPTION_T error;
+  
+  Try{
+    cft = openStream("StringObject.o","rb");
+    cftPtr = cftNew(cft,&tableSize);
+    TEST_ASSERT_EQUAL(209,tableSize);
+  }Catch(error){
+    TEST_ASSERT_NOT_EQUAL(ERR_FILE_NOT_EXIST,error);
+  }
+  
+  Try{
+    in = openStream("StringObject.o","rb");
+    out = openStream("tagObject.bin","wb");
+    arithmeticEncode(in, &dataLength, cftPtr,tableSize,out);
+  }Catch(error){
+    TEST_ASSERT_NOT_EQUAL(ERR_FILE_NOT_EXIST,error);
+  }
+  TEST_ASSERT_EQUAL(5935,dataLength);
+  if(in != NULL){
+    closeStream(in);
+  }if(out != NULL){
+    closeStream(out);
+  }if(cft != NULL){
+    closeStream(cft);
+  }
+}
+
 void test_tagReader_should_read_in_32bit_of_tag_value(){
   Stream *in = NULL;
   uint32 tag = 0;
@@ -223,6 +254,45 @@ void test_arithmeticDecoder_to_decode_tag_with_cftData_txt_should_generate_acba(
   TEST_ASSERT_EQUAL(0,dataLength);
 }
 
+void test_arithmeticDecoder_to_decode_tag_with_Object_should_generate_decodedObject(){
+  Stream *cft = NULL, *in = NULL, *out = NULL;
+  CFT *cftPtr;
+  uint32 tag = 0;
+  int tableSize, dataLength = 5935;
+  CEXCEPTION_T error;
+  
+  Try{
+  // Please check cftData.txt, inside has a lengthy string 
+    cft = openStream("StringObject.o","rb");
+    cftPtr = cftNew(cft,&tableSize);
+    TEST_ASSERT_EQUAL(209,tableSize);
+  }Catch(error){
+    TEST_ASSERT_NOT_EQUAL(ERR_FILE_NOT_EXIST,error);
+  }
+  
+  Try{
+  /* 1100 0101 0110 1101 0101 1100 1111 1001 1100 000 will decode back into acba
+   * tag.txt/.bin will store the tag generate from encode data
+   * acba store into decodeSymbol.txt
+   */
+    in = openStream("tagObject.bin","rb");
+    out = openStream("decodedSymbolObj.o","wb");
+    tagReader(in,&tag);
+    arithmeticDecode(&dataLength, &tag, cftPtr, tableSize, out, in);
+  }Catch(error){
+    TEST_ASSERT_NOT_EQUAL(ERR_FILE_NOT_EXIST,error);
+  }
+  
+  if(in != NULL){
+    closeStream(in);
+  }if(out != NULL){
+    closeStream(out);
+  }if(cft != NULL){
+    closeStream(cft);
+  }
+  // TEST_ASSERT_EQUAL(0,dataLength);
+}
+
 void test_Custom_Assertion_compare_data_in_both_file(){
 	Stream *in = NULL, *out = NULL;
 	
@@ -253,7 +323,20 @@ void test_Custom_Assertion_compare_data_in_both_file_case_2(){
 	}
 }
 
-
+void test_Custom_Assertion_compare_data_in_both_obj_file_case_3(){
+	Stream *in = NULL, *out = NULL;
+	
+	in = openStream("StringObject.o", "rb");
+	out = openStream("decodedSymbolObj.o","rb");
+  
+	TEST_ASSERT_EQUAL_FILE(in,out);
+  
+	if(in != NULL){
+		closeStream(in);
+	}if(out != NULL){
+		closeStream(out);
+	}
+}
 
 
 
